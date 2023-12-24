@@ -15,7 +15,9 @@ const router = express.Router();
 // Use cors with specific origin(s) in production
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 router.use(cors({ origin: allowedOrigins }));
-
+router.get("/", (req, res) => {
+  res.send("authflow");
+});
 router.post("/register", authController.register);
 router.post("/login", authController.login);
 
