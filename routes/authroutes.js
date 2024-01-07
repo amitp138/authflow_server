@@ -8,13 +8,9 @@ const authController = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const cors = require("cors");
 require("dotenv").config();
 const router = express.Router();
 
-// Use cors with specific origin(s) in production
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-router.use(cors({ origin: allowedOrigins }));
 router.get("/", (req, res) => {
   res.send("authflow");
 });
