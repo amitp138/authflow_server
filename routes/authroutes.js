@@ -2,7 +2,7 @@
 
 const express = require("express");
 const sendSms = require("../twilio");
-const nodemailer = require('nodemailer')
+const emailjs = require('emailjs');
 const OtpModel = require("../models/OtpModel");
 const authController = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
@@ -60,29 +60,30 @@ router.post("/api/verifyotp", async (req, res) => {
 
 router.post("/email/welcome", async (req, res) => {
   const { toemail, username } = req.body;
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-    
+  const server = emailjs.server.connect({
+    user: process.env.EMAIL_USER,
+    password: process.env.EMAIL_PASSWORD,
+    host: 'smtp.gmail.com',
+    ssl: true
   });
-  
 
-  const mailOptions = {
+  const message = {
     from: process.env.EMAIL_USER,
     to: toemail,
     subject: "Welcome message",
-    text:`welcome ${username} ,We're glad to have you on board at Authflow`
+    text: `Welcome ${username}, We're glad to have you on board at Authflow`
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.response);
-    res.send(JSON.stringify({ success: true }));
+    server.send(message, (err, message) => {
+      if (err) {
+        console.error("Error sending welcome email:", err);
+        res.send(JSON.stringify({ success: false }));
+      } else {
+        console.log("Email sent:", message);
+        res.send(JSON.stringify({ success: true }));
+      }
+    });
   } catch (error) {
     console.error("Error sending welcome email:", error);
     res.send(JSON.stringify({ success: false }));
@@ -90,36 +91,32 @@ router.post("/email/welcome", async (req, res) => {
 });
 
 function sendResetPasswordEmail(email, resetUrl) {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-    tls: {
-      ciphers: "SSLv3",
-    },
+  const server = emailjs.server.connect({
+    user: process.env.EMAIL_USER,
+    password: process.env.EMAIL_PASSWORD,
+    host: 'smtp.gmail.com',
+    ssl: true
   });
 
-  const mailOptions = {
+  const message = {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Reset Your Password",
-    text: `Click the following link to reset your password: ${resetUrl}`,
+    text: `Click the following link to reset your password: ${resetUrl}`
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error sending reset password email:", error);
-    } else {
-      console.log("Reset password email sent:", info.response);
-    }
-  });
+  try {
+    server.send(message, (err, message) => {
+      if (err) {
+        console.error("Error sending reset password email:", err);
+      } else {
+        console.log("Reset password email sent:", message);
+      }
+    });
+  } catch (error) {
+    console.error("Error sending reset password email:", error);
+  }
 }
-
 router.post("/reset-password", async (req, res) => {
   try {
     const { em } = req.body;
