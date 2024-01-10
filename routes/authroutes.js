@@ -58,65 +58,8 @@ router.post("/api/verifyotp", async (req, res) => {
   }
 });
 
-router.post("/email/welcome", async (req, res) => {
-  const { toemail, username } = req.body;
-  const server = emailjs.server.connect({
-    user: process.env.EMAIL_USER,
-    password: process.env.EMAIL_PASSWORD,
-    host: 'smtp.gmail.com',
-    ssl: true
-  });
 
-  const message = {
-    from: process.env.EMAIL_USER,
-    to: toemail,
-    subject: "Welcome message",
-    text: `Welcome ${username}, We're glad to have you on board at Authflow`
-  };
 
-  try {
-    server.send(message, (err, message) => {
-      if (err) {
-        console.error("Error sending welcome email:", err);
-        res.send(JSON.stringify({ success: false }));
-      } else {
-        console.log("Email sent:", message);
-        res.send(JSON.stringify({ success: true }));
-      }
-    });
-  } catch (error) {
-    console.error("Error sending welcome email:", error);
-    res.send(JSON.stringify({ success: false }));
-  }
-});
-
-function sendResetPasswordEmail(email, resetUrl) {
-  const server = emailjs.server.connect({
-    user: process.env.EMAIL_USER,
-    password: process.env.EMAIL_PASSWORD,
-    host: 'smtp.gmail.com',
-    ssl: true
-  });
-
-  const message = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Reset Your Password",
-    text: `Click the following link to reset your password for authflow: ${resetUrl}`
-  };
-
-  try {
-    server.send(message, (err, message) => {
-      if (err) {
-        console.error("Error sending reset password email:", err);
-      } else {
-        console.log("Reset password email sent:", message);
-      }
-    });
-  } catch (error) {
-    console.error("Error sending reset password email:", error);
-  }
-}
 router.post("/reset-password", async (req, res) => {
   try {
     const { em } = req.body;
@@ -131,8 +74,7 @@ router.post("/reset-password", async (req, res) => {
     });
 
     const resetUrl = `${process.env.RESET_URL_BASE}/${user._id}/${token}`;
-    sendResetPasswordEmail(user.email, resetUrl);
-    res.status(200).json({ message: "Reset password email sent successfully" });
+    res.status(200).json({ resetUrl});
   } catch (error) {
     console.error("Error sending reset password email:", error);
     res.status(500).json({ error: "Internal Server Error" });
