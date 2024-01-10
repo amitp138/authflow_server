@@ -60,15 +60,14 @@ router.post("/api/verifyotp", async (req, res) => {
 
 router.post("/email/welcome", async (req, res) => {
   const { toemail, username } = req.body;
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+  const forwardEmailTransporter = nodemailer.createTransport({
+    host: "smtp.forwardemail.net",
+    port: 465,
     secure: true,
-    requireTLS: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
-    }
+    },
   });
 
   const mailOptions = {
@@ -79,7 +78,7 @@ router.post("/email/welcome", async (req, res) => {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await forwardEmailTransporter.sendMail(mailOptions);
     console.log("Email sent:", info.response);
     res.send(JSON.stringify({ success: true }));
   } catch (error) {
