@@ -63,30 +63,25 @@ router.post("/api/verifyotp", async (req, res) => {
 router.post("/email/welcome", async (req, res) => {
   const { toemail, username } = req.body;
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
-  });
-  const handlebarOptions = {
-    viewEngine: {
-      partialsDir: path.resolve('../views/'),
-      defaultLayout: false,
+    tls: {
+      ciphers: "SSLv3",
     },
-    viewPath: path.resolve('../views/'),
-  };
-  transporter.use("compile", hbs(handlebarOptions));
+  });
+  
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    template: "email",
     to: toemail,
     subject: "Welcome message",
-    context: {
-      name: username,
-      company: 'Authflow'
-    },
+    text:`welcome ${username} ,We're glad to have you on board at Authflow`
   };
 
   try {
