@@ -1,8 +1,6 @@
 // /backend/routes/authRoutes.js
-
 const express = require("express");
 const sendSms = require("../twilio");
-const emailjs = require('emailjs');
 const OtpModel = require("../models/OtpModel");
 const authController = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
