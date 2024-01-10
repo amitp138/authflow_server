@@ -102,7 +102,7 @@ function sendResetPasswordEmail(email, resetUrl) {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Reset Your Password",
-    text: `Click the following link to reset your password: ${resetUrl}`
+    text: `Click the following link to reset your password for authflow: ${resetUrl}`
   };
 
   try {
