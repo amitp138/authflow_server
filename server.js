@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
-const passport = require("passport");
 const cors = require("cors");
 const authRoutes = require("./routes/authroutes");
 require("dotenv").config();
@@ -14,12 +13,9 @@ connectDB();
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.json()); 
-app.use(passport.initialize());
+app.use(express.json());
 // CORS middleware
-app.use(cors()); 
-// Passport config
-require("./config/passport")(passport);
+app.use(cors());
 
 // Routes
 app.use(authRoutes);
